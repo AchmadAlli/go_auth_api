@@ -1,8 +1,6 @@
 package service
 
 import (
-	"errors"
-
 	"github.com/AchmadAlli/go_auth_api/app"
 	"github.com/AchmadAlli/go_auth_api/app/model"
 	"github.com/jinzhu/gorm"
@@ -17,7 +15,14 @@ func CreateUserService(app *app.App) *UserService {
 }
 
 func (u UserService) Index() (*[]model.User, error) {
-	return &[]model.User{}, errors.New("this func is worked")
+	users := []model.User{}
+	err := u.db.Model(&model.User{}).Find(&users).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &users, nil
 }
 
 func (u UserService) Store() (*model.User, error) {

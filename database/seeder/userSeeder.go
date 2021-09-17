@@ -10,17 +10,17 @@ import (
 
 var pass, _ = helper.HashPassword("password")
 var users = []model.User{
-	model.User{
+	{
 		Username: "achmad_ali",
 		Password: pass,
 		Fullname: "Achmad Ali",
 	},
-	model.User{
+	{
 		Username: "achmad_ali_b",
 		Password: pass,
 		Fullname: "Achmad Ali B",
 	},
-	model.User{
+	{
 		Username: "ali_b",
 		Password: pass,
 		Fullname: "Ali Baidlowi",
@@ -28,7 +28,7 @@ var users = []model.User{
 }
 
 func SeedUser(db *gorm.DB) {
-	for i, _ := range users {
+	for i := range users {
 		err := db.Debug().Model(&model.User{}).Create(&users[i]).Error
 		if err != nil {
 			log.Fatalf("cannot seed users table: %v", err)
