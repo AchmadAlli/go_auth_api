@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/AchmadAlli/go_auth_api/app"
+	"github.com/AchmadAlli/go_auth_api/app/request"
 	"github.com/AchmadAlli/go_auth_api/app/service"
 	"github.com/AchmadAlli/go_auth_api/helper"
 	"github.com/jinzhu/gorm"
@@ -38,11 +39,39 @@ func (c UserController) index(ctx echo.Context) error {
 }
 
 func (c UserController) store(ctx echo.Context) error {
-	return helper.RestApi(ctx, "user stored!")
+	data, err := request.ValidateStoreUser(ctx)
+
+	if err != nil {
+		return helper.RestError(ctx, http.StatusBadRequest, err.Error())
+	}
+
+	user, err := c.srv.Store(data)
+	if err != nil {
+		return helper.RestError(ctx, http.StatusBadRequest, err.Error())
+	}
+
+	return helper.RestApi(ctx, user)
 }
 
 func (c UserController) update(ctx echo.Context) error {
-	return helper.RestApi(ctx, "user updated!")
+	id, err := strconv.Atoi(ctx.Param("id"))
+
+	if err != nil {
+		return helper.RestError(ctx, http.StatusNotFound, err.Error())
+	}
+
+	data, err := request.ValidateUpdateUser(ctx)
+
+	if err != nil {
+		return helper.RestError(ctx, http.StatusBadRequest, err.Error())
+	}
+
+	user, err := c.srv.Update(data, uint(id))
+	if err != nil {
+		return helper.RestError(ctx, http.StatusBadRequest, err.Error())
+	}
+
+	return helper.RestApi(ctx, user)
 }
 
 func (c UserController) destroy(ctx echo.Context) error {
