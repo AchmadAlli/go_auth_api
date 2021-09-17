@@ -35,3 +35,14 @@ func RestApi(ctx echo.Context, data interface{}) error {
 
 	return ctx.JSON(http.StatusOK, res)
 }
+
+func RestError(ctx echo.Context, code int, msg string) error {
+
+	res := apiContract{
+		Status: "error",
+		Data:   nil,
+		Error:  msg,
+	}
+
+	return ctx.JSON(code, res)
+}
