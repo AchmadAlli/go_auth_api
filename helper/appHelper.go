@@ -7,6 +7,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type apiContract struct {
@@ -45,4 +46,14 @@ func RestError(ctx echo.Context, code int, msg string) error {
 	}
 
 	return ctx.JSON(code, res)
+}
+
+func HashPassword(pass string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(pass), 14)
+	return string(bytes), err
+}
+
+func CheckPasswordHash(pass, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(pass))
+	return err == nil
 }

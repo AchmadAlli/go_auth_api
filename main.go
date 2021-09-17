@@ -5,6 +5,7 @@ import (
 	"github.com/AchmadAlli/go_auth_api/app/controller"
 	"github.com/AchmadAlli/go_auth_api/app/model"
 	"github.com/AchmadAlli/go_auth_api/database"
+	"github.com/AchmadAlli/go_auth_api/database/seeder"
 	"github.com/jinzhu/gorm"
 )
 
@@ -17,6 +18,7 @@ func main() {
 	}
 
 	migrate(db)
+	seed(db)
 
 	app := app.Init(db)
 	listenServices(&app)
@@ -29,4 +31,8 @@ func listenServices(app *app.App) {
 
 func migrate(db *gorm.DB) {
 	database.HandleMigration(db, &model.User{})
+}
+
+func seed(db *gorm.DB) {
+	seeder.SeedUser(db)
 }
