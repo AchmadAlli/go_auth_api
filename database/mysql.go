@@ -10,11 +10,14 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+var (
+	username = helper.GetEnv("DB_USERNAME")
+	password = helper.GetEnv("DB_PASSWORD")
+	host     = helper.GetEnv("DB_HOST")
+	port     = helper.GetEnv("DB_PORT")
+)
+
 func ConnectMysql() (*gorm.DB, error) {
-	username := helper.GetEnv("DB_USERNAME")
-	password := helper.GetEnv("DB_PASSWORD")
-	host := helper.GetEnv("DB_HOST")
-	port := helper.GetEnv("DB_PORT")
 	database := helper.GetEnv("DB_DATABASE")
 
 	destination := fmt.Sprintf("%s:%s@(%s:%s)/%s?charset=utf8mb4&parseTime=true", username, password, host, port, database)
@@ -24,34 +27,42 @@ func ConnectMysql() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	log.Println("Database connected!")
-
 	db = db.Set("gorm:table_options", "DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci ENGINE=InnoDB")
 	db = db.Set("gorm:auto_preload", true)
 
 	return db, nil
 }
 
-func create(name string) {
+func CreateDatabase(name string) {
+	dsn := fmt.Sprintf("%s:%s@(%s:%s)/", username, password, host, port)
+	db, err := sql.Open("mysql", dsn)
 
-	db, err := sql.Open("mysql", "admin:admin@tcp(127.0.0.1:3306)/")
 	if err != nil {
 		panic(err)
 	}
-	defer db.Close()
+	// defer db.Close()
+
+	_, err = db.Exec("DROP DATABASE IF EXISTS " + name)
+	if err != nil {
+		panic(err)
+	}
 
 	_, err = db.Exec("CREATE DATABASE " + name)
 	if err != nil {
 		panic(err)
 	}
 
-	_, err = db.Exec("USE " + name)
+	db.Close()
+}
+
+func HandleMigration(db *gorm.DB, model interface{}) {
+	err := db.DropTableIfExists(model).Error
 	if err != nil {
-		panic(err)
+		log.Fatalf("cannot drop table: %v", err)
 	}
 
-	_, err = db.Exec("CREATE TABLE example ( id integer, data varchar(32) )")
+	err = db.AutoMigrate(model).Error
 	if err != nil {
-		panic(err)
+		log.Fatalf("cannot migrate table: %v", err)
 	}
 }
