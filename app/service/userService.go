@@ -14,9 +14,9 @@ func CreateUserService(app *app.App) *UserService {
 	return &UserService{app.DB}
 }
 
-func (u UserService) Index() (*[]model.User, error) {
+func (s UserService) Index() (*[]model.User, error) {
 	users := []model.User{}
-	err := u.db.Model(&model.User{}).Find(&users).Error
+	err := s.db.Model(&model.User{}).Find(&users).Error
 
 	if err != nil {
 		return nil, err
@@ -25,18 +25,32 @@ func (u UserService) Index() (*[]model.User, error) {
 	return &users, nil
 }
 
-func (u UserService) Store() (*model.User, error) {
+func (s UserService) Store() (*model.User, error) {
 	return &model.User{}, nil
 }
 
-func (u UserService) Update() (*model.User, error) {
+func (s UserService) Update() (*model.User, error) {
 	return &model.User{}, nil
 }
 
-func (u UserService) Show() (*model.User, error) {
-	return &model.User{}, nil
+func (s UserService) Show(id uint) (*model.User, error) {
+	user := model.User{}
+	err := s.db.First(&user, id).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
 }
 
-func (u UserService) Destroy() error {
-	return nil
+func (s UserService) Destroy(id uint) (*model.User, error) {
+	user := model.User{}
+	err := s.db.Delete(&user, id).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
 }
