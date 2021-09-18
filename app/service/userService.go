@@ -60,6 +60,16 @@ func (s *UserService) Update(data *request.UpdateUser, id uint) (*model.User, er
 	return &userData, nil
 }
 
+func (s *UserService) UpdateAvatar(path string, user *model.User) (*model.User, error) {
+	err := s.db.Model(&user).Update("avatar", path).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
 func (s *UserService) Show(id uint) (*model.User, error) {
 	user := model.User{}
 	err := s.db.First(&user, id).Error
