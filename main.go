@@ -27,6 +27,7 @@ func main() {
 
 func listenServices(app *app.App) {
 	controller.ListenUser(app)
+	controller.ListenAuth(app)
 }
 
 func migrate(db *gorm.DB) {
